@@ -37,7 +37,7 @@ jobs:
           manifest-file: ${{ env.vsixManifestPath }}
 
       - name: Build VSIX
-        run: dotnet publish src/VSClock -p:Version=${{ env.version }} -c Release
+        run: dotnet publish src -p:Version=${{ env.version }} -c Release
 
       - name: Publish Build Artifacts
         uses: actions/upload-artifact@v7
