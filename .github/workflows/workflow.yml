@@ -93,9 +93,9 @@ jobs:
         run: >
           & 'C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe'
           publish
-          -personalAccessToken ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
           -payload ${{ github.workspace }}/${{ env.vsixPath }}
           -publishManifest publish-manifest.json
+          -personalAccessToken ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
 
       - name: Publish to Open VSIX Gallery
         uses: timheuer/openvsixpublish@v1
