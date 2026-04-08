@@ -7,7 +7,7 @@ namespace VSClock;
 [VisualStudioContribution]
 internal class ExtensionEntrypoint : Extension
 {
-    private readonly ClockService _clockService = new();
+    private ClockService? _clockService;
 
     /// <inheritdoc />
     public override ExtensionConfiguration ExtensionConfiguration => new()
@@ -20,10 +20,16 @@ internal class ExtensionEntrypoint : Extension
     protected override void InitializeServices(IServiceCollection serviceCollection)
     {
         base.InitializeServices(serviceCollection);
+
+        // As of now, any instance that ingests VisualStudioExtensibility is required to be added as a scoped
+        // service.
+        serviceCollection.AddScoped<ClockService>();
     }
 
     protected override async Task OnInitializedAsync(VisualStudioExtensibility extensibility, CancellationToken cancellationToken)
     {
-        await _clockService.Initialize(extensibility);
+        await base.OnInitializedAsync(extensibility, cancellationToken);
+
+        _clockService = ServiceProvider.GetRequiredService<ClockService>();
     }
 }

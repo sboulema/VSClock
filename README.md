@@ -1,14 +1,14 @@
 <img src="https://raw.githubusercontent.com/sboulema/VSClock/main/art/Logo_90x90.png" />
 
 # VS Clock 
-Visual Studio extension to show the current time in Visual Studio
+Visual Studio extension to show the current time in the Visual Studio status bar.
 
 [![Sponsor](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/sboulema)
 
 ## Features
 - Adjustable time format
 - Adjustable update interval
-- Clicking the clock will prompt for a new format and update interval
+- Clicking the clock opens the settings dialog
 
 
 ## Supported Visual Studio versions
