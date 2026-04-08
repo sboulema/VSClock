@@ -1,0 +1,8 @@
+{
+  "SettingsVSClock.Settings.Category.DisplayName": "VSClock Settings",
+  "SettingsVSClock.Settings.Category.Description": "Settings for VSClock",
+  "SettingsVSClock.Settings.Format.DisplayName": "DateTime Format String",
+  "SettingsVSClock.Settings.Format.Description": "Format string for display",
+  "SettingsVSClock.Settings.Interval.DisplayName": "Update Interval",
+  "SettingsVSClock.Settings.Interval.Description": "Update interval in millisceonds"
+}
