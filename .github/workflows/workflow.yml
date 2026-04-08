@@ -10,8 +10,8 @@ env:
   version: '1.0.${{ github.run_number }}'
   dotnetVersion: '8'
   repoUrl: ${{ github.server_url }}/${{ github.repository }}
-  vsixPath: src/VSClock/bin/Release/net472/VSClock.vsix
-  vsixManifestPath: ${{ github.workspace }}/src/VSClock/source.extension.vsixmanifest
+  vsixPath: src/bin/Release/net472/VSClock.vsix
+  vsixManifestPath: ${{ github.workspace }}/src/source.extension.vsixmanifest
 
 jobs:
   build:
