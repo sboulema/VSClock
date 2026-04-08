@@ -8,7 +8,7 @@
         <License>Resources\LICENSE</License>
         <ReleaseNotes>https://github.com/sboulema/VSClock/releases</ReleaseNotes>
         <Icon>Resources\Logo_90x90.png</Icon>
-        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <PreviewImage>Resources\Screenshot.png</PreviewImage>
         <Tags>office, other, workflow, time</Tags>
     </Metadata>
     <Installation ExtensionType="VSSDK+VisualStudio.Extensibility">
