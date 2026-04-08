@@ -4,6 +4,12 @@
         <Identity Id="VSClock.07a4b650-aeca-474d-9cd6-4f5d58691f4b" Version="1.0" Language="en-US" Publisher="Samir Boulema" />
         <DisplayName>VSClock</DisplayName>
         <Description xml:space="preserve">Show a clock in the Visual Studio statusbar</Description>
+        <MoreInfo>https://github.com/sboulema/VSClock</MoreInfo>
+        <License>Resources\LICENSE</License>
+        <ReleaseNotes>https://github.com/sboulema/VSClock/releases</ReleaseNotes>
+        <Icon>Resources\Logo_90x90.png</Icon>
+        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <Tags>office, other, workflow, time</Tags>
     </Metadata>
     <Installation ExtensionType="VSSDK+VisualStudio.Extensibility">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14,)">

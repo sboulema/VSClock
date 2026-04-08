@@ -1,17 +1,33 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <UseWPF>true</UseWPF>
-
     <VssdkCompatibleExtension>true</VssdkCompatibleExtension>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Logo_90x90.png" />
+    <None Remove="Resources\LICENSE" />
+    <None Remove="Screenshot.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Resources\LICENSE" />
+    <Resource Include="Resources\Logo_90x90.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Resource>
+    <Resource Include="Resources\Screenshot.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Resource>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" />
   </ItemGroup>
+
 </Project>

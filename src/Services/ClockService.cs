@@ -1,55 +1,146 @@
-﻿using Microsoft.VisualStudio.Extensibility.VSSdkCompatibility;
+﻿using Microsoft.VisualStudio.Extensibility;
+using Microsoft.VisualStudio.Extensibility.Shell;
+using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
+using VSClock.Helpers;
+using VSClock.Models;
 
 namespace VSClock.Services;
 
-internal class ClockService
+internal class ClockService()
 {
-    private readonly AsyncServiceProviderInjection<SVsStatusbar, IVsStatusbar> _vsStatusbar;
-    private readonly System.Timers.Timer? _timer = new();
+    private DispatcherTimer? _updateTimer;
+    private TextBlock? _textBlock;
+    private VisualStudioExtensibility? _extensibility;
 
     private string _format = "yyyy-MM-dd (dddd) HH:mm:ss";
     private int _updateInterval = 1000;
 
-    public ClockService(
-        AsyncServiceProviderInjection<SVsStatusbar,
-        IVsStatusbar> vsStatusbar)
+    public async Task Initialize(VisualStudioExtensibility extensibility)
     {
-        _vsStatusbar = vsStatusbar;
+        _extensibility = extensibility;
+
+        await InitializeSettings();
+
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        var panel = new DockPanel
+        {
+            Margin = new Thickness(0, 0, 5, 0),
+            Height = 22,
+        };
+
+        panel.MouseUp += PromptSettings;
+
+        AddTimeIcon(panel);
+
+        AddTextBlock(panel);
+
+        await StatusBarInjector.InjectControlAsync(panel);
+
         InitializeTimer();
+    }
+
+    private async Task InitializeSettings()
+    {
+        var globalSettings = await SettingsHelper.LoadGlobalSettings();
+        _format = globalSettings.Format;
+        _updateInterval = globalSettings.UpdateInterval;
     }
 
     private void InitializeTimer()
     {
-        _timer!.Interval = _updateInterval;
-        _timer.Elapsed += Timer_Elapsed;
-        _timer.Enabled = true;
+        _updateTimer = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = TimeSpan.FromMilliseconds(_updateInterval)
+        };
+        _updateTimer.Tick += OnUpdateTick;
+        _updateTimer.Start();
     }
 
-    private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    private CrispImage AddTimeIcon(DockPanel panel)
+    {
+        var timeIcon = new CrispImage
+        {
+            Moniker = KnownMonikers.Time,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 5, 0),
+        };
+
+        panel.Children.Add(timeIcon);
+
+        return timeIcon;
+    }
+
+    private void AddTextBlock(DockPanel panel)
+    {
+        var brush = Application.Current.TryFindResource(VsBrushes.StatusBarTextKey) as SolidColorBrush;
+
+        _textBlock = new TextBlock
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = brush
+        };
+
+        panel.Children.Add(_textBlock);
+    }
+
+    private void OnUpdateTick(object? sender, EventArgs e)
         => _ = UpdateClock();
+
+    private void PromptSettings(object sender, MouseButtonEventArgs e)
+        => _ = PromptSettings();
+
+    private async Task PromptSettings()
+    {
+        if (_extensibility == null)
+        {
+            return;
+        }
+
+        var formatPromptString = await _extensibility.Shell().ShowPromptAsync(
+            "Format",
+            InputPromptOptions.Question,
+            default);
+
+        var updateIntervalPromptString = await _extensibility.Shell().ShowPromptAsync(
+            "Update Interval",
+            InputPromptOptions.Question,
+            default);
+
+        var updateInterval = int.TryParse(updateIntervalPromptString, out var interval) ? interval : _updateInterval;
+
+        var globalSettings = new GlobalSettings
+        {
+            Format = !string.IsNullOrEmpty(formatPromptString) ? formatPromptString! : _format,
+            UpdateInterval = updateInterval
+        };
+
+        await SettingsHelper.SaveGlobalSettings(globalSettings);
+
+        _format = globalSettings.Format;
+
+        if (_updateTimer != null)
+        {
+            _updateTimer.Interval = TimeSpan.FromMilliseconds(globalSettings.UpdateInterval);
+        }
+    }
 
     private async Task UpdateClock()
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        var vsStatusbarService = await _vsStatusbar.GetServiceAsync();
-
-        try
+        if (_textBlock == null)
         {
-            vsStatusbarService.SetText(DateTime.Now.ToString(_format));
-
-            vsStatusbarService.IsFrozen(out int frozen);
-
-            if (frozen != 0)
-            {
-                vsStatusbarService.FreezeOutput(0);
-            }
+            return;
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"!!! EXCEPTION in UpdateClock: {ex.Message}");
-        }
+
+        _textBlock.Text = DateTime.Now.ToString(_format);
     }
 }
