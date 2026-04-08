@@ -12,16 +12,9 @@
     <None Remove="Logo_90x90.png" />
     <None Remove="Resources\LICENSE" />
     <None Remove="Screenshot.png" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Content Include="Resources\LICENSE" />
-    <Resource Include="Resources\Logo_90x90.png">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Resource>
-    <Resource Include="Resources\Screenshot.png">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Resource>
+    <Content Include="Resources\Logo_90x90.png" />
+    <Content Include="Resources\Screenshot.png" />
   </ItemGroup>
 
   <ItemGroup>
