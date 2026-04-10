@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs
+*.user
+/src/VSClock.OutOfProc/bin
+/src/VSClock.OutOfProc/obj
+/src/VSClock/bin
+/src/VSClock/obj

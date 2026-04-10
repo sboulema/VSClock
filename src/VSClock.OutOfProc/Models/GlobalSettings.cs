@@ -1,11 +1,13 @@
-﻿namespace VSClock.Models;
+﻿using VSClock.OutOfProc.Services;
+
+namespace VSClock.OutOfProc.Models;
 
 public class GlobalSettings
 {
     /// <summary>
-    /// Format string for the clock display. Default is "yyyy-MM-dd (dddd) HH:mm:ss".
+    /// Format string for the clock display.
     /// </summary>
-    public string Format { get; set; } = "yyyy-MM-dd (dddd) HH:mm:ss";
+    public string Format { get; set; } = ClockService.GetDefaultFormat();
 
     /// <summary>
     /// Update interval for the clock in milliseconds. Default is 1000ms (1 second).
