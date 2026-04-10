@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
-using VSClock.Models;
+using VSClock.OutOfProc.Models;
 
-namespace VSClock.Helpers;
+namespace VSClock.OutOfProc.Helpers;
 
 public static class SettingsHelper
 {

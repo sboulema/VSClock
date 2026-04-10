@@ -1,5 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/VSClock.csproj" />
+    <Project Path="src/VSClock.OutOfProc/VSClock.OutOfProc.csproj">
+      <Deploy />
+    </Project>
+    <Project Path="src/VSClock/VSClock.csproj" />
   </Folder>
 </Solution>

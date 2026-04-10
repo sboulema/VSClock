@@ -1,19 +1,26 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Extensibility;
-using VSClock.Services;
+using VSClock.OutOfProc.Services;
 
-namespace VSClock;
+namespace VSClock.OutOfProc;
 
+/// <summary>
+/// Extension entrypoint for the VisualStudio.Extensibility extension.
+/// </summary>
 [VisualStudioContribution]
 internal class ExtensionEntrypoint : Extension
 {
     private ClockService? _clockService;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override ExtensionConfiguration ExtensionConfiguration => new()
     {
-        RequiresInProcessHosting = true,
-        LoadedWhen = ActivationConstraint.SolutionState(SolutionState.NoSolution),
+        Metadata = new(
+                id: "VSClock.07a4b650-aeca-474d-9cd6-4f5d58691f4b",
+                version: ExtensionAssemblyVersion,
+                publisherName: "Samir Boulema",
+                displayName: "VSClock",
+                description: "Show a clock in the Visual Studio statusbar"),
     };
 
     /// <inheritdoc />
@@ -21,15 +28,11 @@ internal class ExtensionEntrypoint : Extension
     {
         base.InitializeServices(serviceCollection);
 
+        // Add the brokered service for in-out proc communication
+        serviceCollection.ProfferBrokeredService<OutOfProcService>();
+
         // As of now, any instance that ingests VisualStudioExtensibility is required to be added as a scoped
         // service.
         serviceCollection.AddScoped<ClockService>();
-    }
-
-    protected override async Task OnInitializedAsync(VisualStudioExtensibility extensibility, CancellationToken cancellationToken)
-    {
-        await base.OnInitializedAsync(extensibility, cancellationToken);
-
-        _clockService = ServiceProvider.GetRequiredService<ClockService>();
     }
 }
