@@ -12,31 +12,31 @@ Request/inspiration for this extension came from this tweet:
 > [X](https://x.com/NealCuliner/status/2041529498886164694) - Neal Culiner ([@NealCuliner](https://x.com/NealCuliner)) - 4:52 PM · Apr 7, 2026
 
 
-# :sparkles: Features
+# ✨ Features
 - Adjustable time format
 - Adjustable update interval
 - Clicking the clock opens the settings dialog
 - Clock is always the last item on the right side of the status bar
 
 
-# :computer: Supported Visual Studio versions
+# 💻 Supported Visual Studio versions
 
 - Visual Studio 2022 (Untested)
 - Visual Studio 2026
 
-# :arrow_down: Installing
+# ⬇️ Installing
 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=SamirBoulema.VSClock)
 
 [GitHub Releases](https://github.com/sboulema/VSClock/releases)
 
 [Open VSIX Gallery](https://www.vsixgallery.com/extension/VSClock.07a4b650-aeca-474d-9cd6-4f5d58691f4b)
 
-# :framed_picture: Screenshots
+# 🖼️ Screenshots
 ![Preview](https://raw.githubusercontent.com/sboulema/VSClock/main/art/Screenshot.png)
 
 ![Settings](https://raw.githubusercontent.com/sboulema/VSClock/main/art/Settings.png)
 
-# :link: Links
+# 🔗 Links
 - [VS_StatusBarClock](https://github.com/suwanohiro/VS_StatusBarClock)
 - [StatusBarInjector](https://github.com/madskristensen/DeveloperNews/blob/master/src/DeveloperNews/StatusBarInjector.cs)
 - [Stop and change interval of System.Window.Threading.DispatcherTimer](https://stackoverflow.com/questions/17490120/stop-and-change-interval-of-system-window-threading-dispatchertimer)
