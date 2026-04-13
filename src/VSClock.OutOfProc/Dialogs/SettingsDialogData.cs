@@ -26,6 +26,12 @@ public class SettingsDialogData
     [DataMember]
     public int UpdateInterval { get; set; } = 1000;
 
+    /// <summary>
+    /// Show clock icon in the status bar. Default is true.
+    /// </summary>
+    [DataMember]
+    public bool ShowClockIcon { get; set; } = true;
+
     [DataMember]
     public AsyncCommand OpenHyperlinkCommand { get; }
     private async Task OpenHyperlink(object? commandParameter, IClientContext clientContext, CancellationToken cancellationToken)

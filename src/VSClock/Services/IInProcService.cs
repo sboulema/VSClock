@@ -6,7 +6,7 @@ public interface IInProcService
 {
     Task Inject(CancellationToken cancellationToken);
 
-    Task UpdateClock(string format);
+    Task UpdateClock(string format, bool showClockIcon);
 
     public static class Configuration
     {

@@ -31,7 +31,8 @@ internal class OutOfProcService(
         var settingsDialogData = new SettingsDialogData
         {
             Format = globalSettings.Format,
-            UpdateInterval = globalSettings.UpdateInterval
+            UpdateInterval = globalSettings.UpdateInterval,
+            ShowClockIcon = globalSettings.ShowClockIcon,
         };
 
         var dialogResult = await extensibility.Shell().ShowDialogAsync(
@@ -49,16 +50,8 @@ internal class OutOfProcService(
         await SettingsHelper.SaveGlobalSettings(new()
         {
             Format = settingsDialogData.Format,
-            UpdateInterval = settingsDialogData.UpdateInterval
+            UpdateInterval = settingsDialogData.UpdateInterval,
+            ShowClockIcon = settingsDialogData.ShowClockIcon,
         });
-
-        // Apply the new format (on the next tick) on the clock display
-        clockService.Format = settingsDialogData.Format;
-
-        // Apply the new interval on the update timer
-        if (clockService.UpdateTimer != null)
-        {
-            clockService.UpdateTimer.Interval = settingsDialogData.UpdateInterval;
-        }
     }
 }

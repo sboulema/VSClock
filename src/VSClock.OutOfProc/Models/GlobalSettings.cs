@@ -13,4 +13,9 @@ public class GlobalSettings
     /// Update interval for the clock in milliseconds. Default is 1000ms (1 second).
     /// </summary>
     public int UpdateInterval { get; set; } = 1000;
+
+    /// <summary>
+    /// Show clock icon in the status bar. Default is true.
+    /// </summary>
+    public bool ShowClockIcon { get; set; } = true;
 }

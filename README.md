@@ -15,6 +15,7 @@ Request/inspiration for this extension came from this tweet:
 # ✨ Features
 - Adjustable time format
 - Adjustable update interval
+- Hide or show the clock icon
 - Clicking the clock opens the settings dialog
 - Clock is always the last item on the right side of the status bar
 
