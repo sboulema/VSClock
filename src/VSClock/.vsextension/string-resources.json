@@ -4,5 +4,6 @@
   "SettingsVSClock.Settings.Format.DisplayName": "DateTime Format String",
   "SettingsVSClock.Settings.Format.Description": "Format string for display",
   "SettingsVSClock.Settings.Interval.DisplayName": "Update Interval",
-  "SettingsVSClock.Settings.Interval.Description": "Update interval in millisceonds"
+  "SettingsVSClock.Settings.Interval.Description": "Update interval in millisceonds",
+  "VSClock.InjectTestCommand.DisplayName": "VSClock: Inject Test"
 }

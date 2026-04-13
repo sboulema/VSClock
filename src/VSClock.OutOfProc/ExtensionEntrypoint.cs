@@ -10,8 +10,6 @@ namespace VSClock.OutOfProc;
 [VisualStudioContribution]
 internal class ExtensionEntrypoint : Extension
 {
-    private ClockService? _clockService;
-
     /// <inheritdoc/>
     public override ExtensionConfiguration ExtensionConfiguration => new()
     {

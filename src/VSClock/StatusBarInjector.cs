@@ -7,7 +7,7 @@ namespace VSClock;
 
 internal static class StatusBarInjector
 {
-    private static Panel? _panel;
+    private static Panel? _statusbarPanel;
 
     // Constants for better maintainability
     private const string StatusBarPanelName = "StatusBarPanel";
@@ -44,11 +44,11 @@ internal static class StatusBarInjector
 
     private static async Task EnsureUIAsync()
     {
-        while (_panel is null)
+        while (_statusbarPanel is null)
         {
-            _panel = FindChild(Application.Current?.MainWindow, StatusBarPanelName) as DockPanel;
+            _statusbarPanel = FindChild(Application.Current?.MainWindow, StatusBarPanelName) as DockPanel;
 
-            if (_panel is null)
+            if (_statusbarPanel is null)
             {
                 // Start window is showing. Need to wait for status bar render.
                 await Task.Delay(StatusBarRetryDelayMilliseconds);
@@ -69,6 +69,28 @@ internal static class StatusBarInjector
 
         element.SetValue(DockPanel.DockProperty, Dock.Right);
 
-        _panel?.Children.Insert(1, element);
+        _statusbarPanel?.Children.Insert(1, element);
+    }
+
+    public static async Task MoveToLast(FrameworkElement? element)
+    {
+        if (element == null ||
+            _statusbarPanel == null)
+        {
+            return;
+        }
+
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+        var currentIndex = _statusbarPanel.Children.IndexOf(element);
+
+        if (currentIndex == -1 ||
+            currentIndex == 1)
+        {
+            return;
+        }
+
+        _statusbarPanel.Children.Remove(element);
+        _statusbarPanel.Children.Insert(1, element);
     }
 }

@@ -13,6 +13,7 @@ namespace VSClock.Services;
 [VisualStudioContribution]
 internal class InProcService(VisualStudioExtensibility extensibility) : IInProcService
 {
+    private DockPanel? _clockDockPanel;
     private TextBlock? _textBlock;
 
     [VisualStudioContribution]
@@ -22,35 +23,45 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
             ServiceAudience = BrokeredServiceAudience.Local | BrokeredServiceAudience.Public,
         };
 
+    /// <summary>
+    /// Create, wire up events, and inject the clock control into the status bar.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Awaitable Task</returns>
     public async Task Inject(CancellationToken cancellationToken)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        var panel = new DockPanel
+        _clockDockPanel = new DockPanel
         {
             Margin = new Thickness(0, 0, 5, 0),
             Height = 22,
         };
 
-        panel.MouseUp += OpenSettingsDialog;
+        _clockDockPanel.MouseUp += OpenSettingsDialog;
 
-        AddTimeIcon(panel);
+        AddTimeIcon(_clockDockPanel);
 
-        AddTextBlock(panel);
+        AddTextBlock(_clockDockPanel);
 
-        await StatusBarInjector.InjectControlAsync(panel);
+        await StatusBarInjector.InjectControlAsync(_clockDockPanel);
     }
 
+    /// <summary>
+    /// Update the date time display on the clock and ensure the clock is the last item in the status bar.
+    /// </summary>
+    /// <param name="format">DateTime format</param>
+    /// <returns>Awaitable Task</returns>
     public async Task UpdateClock(string format)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (_textBlock == null)
+        if (_textBlock != null)
         {
-            return;
+            _textBlock.Text = DateTime.Now.ToString(format);
         }
 
-        _textBlock.Text = DateTime.Now.ToString(format);
+        await StatusBarInjector.MoveToLast(_clockDockPanel);
     }
 
     private CrispImage AddTimeIcon(DockPanel panel)
