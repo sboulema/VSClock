@@ -14,7 +14,8 @@ namespace VSClock.Services;
 internal class InProcService(VisualStudioExtensibility extensibility) : IInProcService
 {
     private DockPanel? _clockDockPanel;
-    private TextBlock? _textBlock;
+    private TextBlock? _clockTextBlock;
+    private CrispImage? _clockIcon;
 
     [VisualStudioContribution]
     public static BrokeredServiceConfiguration BrokeredServiceConfiguration
@@ -32,17 +33,13 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        _clockDockPanel = new DockPanel
-        {
-            Margin = new Thickness(0, 0, 5, 0),
-            Height = 22,
-        };
+        CreateClockDockPanel();
 
-        _clockDockPanel.MouseUp += OpenSettingsDialog;
+        CreateClockTextBlock();
 
-        AddTimeIcon(_clockDockPanel);
+        CreateClockIcon();
 
-        AddTextBlock(_clockDockPanel);
+        InsertElement(_clockTextBlock);
 
         await StatusBarInjector.InjectControlAsync(_clockDockPanel);
     }
@@ -52,43 +49,113 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     /// </summary>
     /// <param name="format">DateTime format</param>
     /// <returns>Awaitable Task</returns>
-    public async Task UpdateClock(string format)
+    public async Task UpdateClock(string format, bool showClockIcon)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (_textBlock != null)
+        if (_clockTextBlock != null)
         {
-            _textBlock.Text = DateTime.Now.ToString(format);
+            _clockTextBlock.Text = DateTime.Now.ToString(format);
+        }
+
+        if (showClockIcon)
+        {
+            InsertElement(_clockIcon);
+        }
+        else
+        {
+            RemoveClockIcon();
+        }
+
+        if (_clockTextBlock != null)
+        {
+            _clockTextBlock.Margin = new Thickness(showClockIcon ? 0 : 9, 0, 9, 0);
         }
 
         await StatusBarInjector.MoveToLast(_clockDockPanel);
     }
 
-    private CrispImage AddTimeIcon(DockPanel panel)
+    private void RemoveClockIcon()
     {
-        var timeIcon = new CrispImage
+        if (_clockDockPanel == null ||
+            !_clockDockPanel.Children.Contains(_clockIcon))
+        {
+            return;
+        }
+
+        _clockDockPanel.Children.Remove(_clockIcon);
+    }
+
+    /// <summary>
+    /// Create and wire up the DockPanel that holds the other elements 
+    /// </summary>
+    /// <remarks>Creation is done in a method since we need to be on the UI thread.</remarks>
+    private void CreateClockDockPanel()
+    {
+        _clockDockPanel = new()
+        {
+            Height = 22,
+        };
+
+        _clockDockPanel.MouseUp += OpenSettingsDialog;
+
+        _clockDockPanel.MouseEnter += ChangePanelBackground;
+        _clockDockPanel.MouseLeave += ChangePanelBackground;
+    }
+
+    private void ChangePanelBackground(object sender, MouseEventArgs e)
+    {
+        if (Application.Current.TryFindResource(VsBrushes.StartPageTextSubHeadingSelectedKey) is not SolidColorBrush brush)
+        {
+            return;
+        }
+
+        _clockDockPanel!.Background = _clockDockPanel.IsMouseOver
+            ? new SolidColorBrush(brush.Color) { Opacity = 0.2 }
+            : Brushes.Transparent;
+    }
+
+    /// <summary>
+    /// Create the textblock that will show the date and time 
+    /// </summary>
+    /// <remarks>Creation is done in a method since we need to be on the UI thread.</remarks>
+    private void CreateClockTextBlock()
+    {
+        _clockTextBlock = new()
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = Application.Current.TryFindResource(VsBrushes.StatusBarTextKey) as SolidColorBrush,
+            Margin = new Thickness(0, 0, 9, 0),
+        };
+    }
+
+    /// <summary>
+    /// Create the clock icon that will show 
+    /// </summary>
+    /// <remarks>Creation is done in a method since we need to be on the UI thread.</remarks>
+    private void CreateClockIcon()
+    {
+        _clockIcon = new()
         {
             Moniker = KnownMonikers.Time,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(0, 0, 5, 0),
+            Margin = new Thickness(9, 0, 9, 0),
         };
-
-        panel.Children.Add(timeIcon);
-
-        return timeIcon;
     }
 
-    private void AddTextBlock(DockPanel panel)
+    /// <summary>
+    /// Insert framework element to the VSClock DockPanel in the status bar if it's not already added.
+    /// </summary>
+    private void InsertElement(FrameworkElement? frameworkElement)
     {
-        var brush = Application.Current.TryFindResource(VsBrushes.StatusBarTextKey) as SolidColorBrush;
-
-        _textBlock = new TextBlock
+        if (frameworkElement == null ||
+            _clockDockPanel == null ||
+            _clockDockPanel.Children.Contains(frameworkElement))
         {
-            VerticalAlignment = VerticalAlignment.Center,
-            Foreground = brush
-        };
+            return;
+        }
 
-        panel.Children.Add(_textBlock);
+        _clockDockPanel.Children.Insert(0, frameworkElement);
     }
 
     private void OpenSettingsDialog(object sender, MouseButtonEventArgs e)

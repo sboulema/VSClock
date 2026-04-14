@@ -7,7 +7,7 @@ on:
       - 'feature/**'
 
 env:
-  version: '1.2.${{ github.run_number }}'
+  version: '1.3.${{ github.run_number }}'
   dotnetVersion: '8'
   repoUrl: ${{ github.server_url }}/${{ github.repository }}
   vsixPath: src/VSClock/bin/Release/net472/VSClock.vsix

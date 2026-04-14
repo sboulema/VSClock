@@ -11,6 +11,8 @@ public static class SettingsHelper
 
     private static readonly string _globalSettingsFile = Path.Combine(_globalSettingsFolder, "VSClock.json");
 
+    private static GlobalSettings? _globalSettings;
+
     /// <summary>
     /// Save global settings to disk.
     /// </summary>
@@ -28,6 +30,8 @@ public static class SettingsHelper
             using var writer = new StreamWriter(_globalSettingsFile, false);
 
             await writer.WriteAsync(json);
+
+            _globalSettings = settings;
         }
         catch (Exception)
         {
@@ -52,7 +56,9 @@ public static class SettingsHelper
             var json = await reader.ReadToEndAsync();
             var settings = JsonConvert.DeserializeObject<GlobalSettings>(json);
 
-            return settings ?? new();
+            _globalSettings = settings ?? new();
+
+            return _globalSettings;
         }
         catch (Exception)
         {
@@ -61,4 +67,11 @@ public static class SettingsHelper
 
         return new();
     }
+
+    /// <summary>
+    /// Loads cached global settings from memory or loads them from disk if not cached.
+    /// </summary>
+    /// <returns></returns>
+    public static async Task<GlobalSettings> GetGlobalSettings()
+        => _globalSettings ?? await LoadGlobalSettings();
 }

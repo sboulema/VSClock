@@ -10,17 +10,13 @@ namespace VSClock.OutOfProc.Services;
 internal class ClockService(VisualStudioExtensibility extensibility) : DisposableObject
 {
     private IInProcService? _inProcService;
-
-    public Timer? UpdateTimer;
-
-    public string Format = GetDefaultFormat();
-    public int UpdateInterval = 1000;
+    private Timer? UpdateTimer;
 
     public async Task InitializeAsync()
     {
-        await InitializeSettings();
+        var globalSettings = await SettingsHelper.LoadGlobalSettings();
 
-        InitializeTimer();
+        InitializeTimer(globalSettings.UpdateInterval);
 
         (_inProcService as IDisposable)?.Dispose();
         _inProcService = await extensibility
@@ -30,16 +26,9 @@ internal class ClockService(VisualStudioExtensibility extensibility) : Disposabl
         await InjectClock(default);
     }
 
-    private async Task InitializeSettings()
+    private void InitializeTimer(int interval)
     {
-        var globalSettings = await SettingsHelper.LoadGlobalSettings();
-        Format = globalSettings.Format;
-        UpdateInterval = globalSettings.UpdateInterval;
-    }
-
-    private void InitializeTimer()
-    {
-        UpdateTimer = new Timer(UpdateInterval);
+        UpdateTimer = new Timer(interval);
         UpdateTimer.Elapsed += OnUpdateTick;
         UpdateTimer.Start();
     }
@@ -66,7 +55,10 @@ internal class ClockService(VisualStudioExtensibility extensibility) : Disposabl
         try
         {
             Assumes.NotNull(_inProcService);
-            await _inProcService.UpdateClock(Format);
+
+            var globalSettings = await SettingsHelper.GetGlobalSettings();
+
+            await _inProcService.UpdateClock(globalSettings.Format, globalSettings.ShowClockIcon);
         }
         catch (Exception)
         {
