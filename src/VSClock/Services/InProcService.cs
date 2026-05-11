@@ -31,17 +31,33 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     /// <returns>Awaitable Task</returns>
     public async Task Inject(CancellationToken cancellationToken)
     {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        var outOfProcService = await extensibility.ServiceBroker
+            .GetProxyAsync<IOutOfProcService>(IOutOfProcService.Configuration.ServiceDescriptor, cancellationToken: default);
 
-        CreateClockDockPanel();
+        try
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        CreateClockTextBlock();
+            CreateClockDockPanel();
 
-        CreateClockIcon();
+            CreateClockTextBlock();
 
-        InsertElement(_clockTextBlock);
+            CreateClockIcon();
 
-        await StatusBarInjector.InjectControlAsync(_clockDockPanel);
+            InsertElement(_clockTextBlock);
+
+            await StatusBarInjector.InjectControlAsync(_clockDockPanel);
+        }
+        catch (Exception e)
+        {
+            Assumes.NotNull(outOfProcService);
+
+            await outOfProcService.WriteException($"Failed to inject clock control. '{e.Message}'");
+        }
+        finally
+        {
+            (outOfProcService as IDisposable)?.Dispose();
+        }
     }
 
     /// <summary>
@@ -51,28 +67,45 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     /// <returns>Awaitable Task</returns>
     public async Task UpdateClock(string format, bool showClockIcon)
     {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        var outOfProcService = await extensibility.ServiceBroker
+            .GetProxyAsync<IOutOfProcService>(IOutOfProcService.Configuration.ServiceDescriptor, cancellationToken: default);
 
-        if (_clockTextBlock != null)
-        {
-            _clockTextBlock.Text = DateTime.Now.ToString(format);
-        }
 
-        if (showClockIcon)
+        try
         {
-            InsertElement(_clockIcon);
-        }
-        else
-        {
-            RemoveClockIcon();
-        }
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        if (_clockTextBlock != null)
-        {
-            _clockTextBlock.Margin = new Thickness(showClockIcon ? 0 : 9, 0, 9, 0);
-        }
+            if (_clockTextBlock != null)
+            {
+                _clockTextBlock.Text = DateTime.Now.ToString(format);
+            }
 
-        await StatusBarInjector.MoveToLast(_clockDockPanel);
+            if (showClockIcon)
+            {
+                InsertElement(_clockIcon);
+            }
+            else
+            {
+                RemoveClockIcon();
+            }
+
+            if (_clockTextBlock != null)
+            {
+                _clockTextBlock.Margin = new Thickness(showClockIcon ? 0 : 9, 0, 9, 0);
+            }
+
+            await StatusBarInjector.MoveToLast(_clockDockPanel);
+        }
+        catch (Exception e)
+        {
+            Assumes.NotNull(outOfProcService);
+
+            await outOfProcService.WriteException($"Failed to update clock control. '{e.Message}'");
+        }
+        finally
+        {
+            (outOfProcService as IDisposable)?.Dispose();
+        }
     }
 
     private void RemoveClockIcon()

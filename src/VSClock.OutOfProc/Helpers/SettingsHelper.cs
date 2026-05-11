@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using VSClock.OutOfProc.Models;
+using VSClock.OutOfProc.Services;
 
 namespace VSClock.OutOfProc.Helpers;
 
@@ -16,7 +17,9 @@ public static class SettingsHelper
     /// <summary>
     /// Save global settings to disk.
     /// </summary>
-    public static async Task SaveGlobalSettings(GlobalSettings settings)
+    public static async Task SaveGlobalSettings(
+        GlobalSettings settings,
+        OutputWindowService outputWindowService)
     {
         try
         {
@@ -33,9 +36,9 @@ public static class SettingsHelper
 
             _globalSettings = settings;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // TODO: Implement logging
+            await outputWindowService.WriteException("Failed to save global settings.", e);
         }
     }
 
@@ -43,7 +46,7 @@ public static class SettingsHelper
     /// <summary>
     /// Loads saved global settings from disk.
     /// </summary>
-    public static async Task<GlobalSettings> LoadGlobalSettings()
+    public static async Task<GlobalSettings> LoadGlobalSettings(OutputWindowService outputWindowService)
     {
         try
         {
@@ -60,9 +63,9 @@ public static class SettingsHelper
 
             return _globalSettings;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // TODO: Implement logging
+            await outputWindowService.WriteException("Failed to load global settings.", e);
         }
 
         return new();
@@ -72,6 +75,6 @@ public static class SettingsHelper
     /// Loads cached global settings from memory or loads them from disk if not cached.
     /// </summary>
     /// <returns></returns>
-    public static async Task<GlobalSettings> GetGlobalSettings()
-        => _globalSettings ?? await LoadGlobalSettings();
+    public static async Task<GlobalSettings> GetGlobalSettings(OutputWindowService outputWindowService)
+        => _globalSettings ?? await LoadGlobalSettings(outputWindowService);
 }

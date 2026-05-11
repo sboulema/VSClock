@@ -1,0 +1,57 @@
+﻿using Microsoft.VisualStudio.Extensibility;
+using Microsoft.VisualStudio.Extensibility.Documents;
+using Microsoft.VisualStudio.Extensibility.Helpers;
+
+namespace VSClock.OutOfProc.Services;
+
+#pragma warning disable VSEXTPREVIEW_OUTPUTWINDOW // Type is for evaluation purposes only and is subject to change or removal in future updates.
+
+public class OutputWindowService : DisposableObject
+{
+    private readonly VisualStudioExtensibility _extensibility;
+    private readonly Task _initializationTask;
+    private OutputChannel? _outputChannel;
+
+    public OutputWindowService(VisualStudioExtensibility extensibility)
+    {
+        _extensibility = extensibility;
+        _initializationTask = Task.Run(InitializeAsync);
+    }
+
+    public Task WriteInfo(string text)
+        => WriteLine($"[Info] {text}");
+
+    public Task WriteWarning(string message)
+        => WriteLine($"[Warning] {message}");
+
+    public Task WriteException(string message, Exception exception)
+        => WriteLine($"[Exception] {message}{Environment.NewLine}{exception.Message}{Environment.NewLine}{exception.StackTrace}");
+
+    public async Task WriteLine(string text)
+    {
+        if (_outputChannel is null)
+        {
+            return;
+        }
+
+        await _outputChannel.WriteLineAsync(text);
+    }
+
+    private async Task InitializeAsync()
+    {
+        _outputChannel = await _extensibility
+            .Views()
+            .Output
+            .CreateOutputChannelAsync("VSClock", default);
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        base.Dispose(isDisposing);
+
+        if (isDisposing)
+        {
+            _outputChannel?.Dispose();
+        }
+    }
+}

@@ -9,7 +9,8 @@ namespace VSClock.OutOfProc.Services;
 [VisualStudioContribution]
 internal class OutOfProcService(
     VisualStudioExtensibility extensibility,
-    ClockService clockService) : IOutOfProcService, IBrokeredService
+    ClockService clockService,
+    OutputWindowService outputWindowService) : IOutOfProcService, IBrokeredService
 {
     public static BrokeredServiceConfiguration BrokeredServiceConfiguration
         => new(IOutOfProcService.Configuration.ServiceName, IOutOfProcService.Configuration.ServiceVersion, typeof(OutOfProcService))
@@ -26,7 +27,7 @@ internal class OutOfProcService(
 
     public async Task OpenSettingsDialog(CancellationToken cancellationToken)
     {
-        var globalSettings = await SettingsHelper.LoadGlobalSettings();
+        var globalSettings = await SettingsHelper.LoadGlobalSettings(outputWindowService);
 
         var settingsDialogData = new SettingsDialogData
         {
@@ -47,11 +48,16 @@ internal class OutOfProcService(
         }
 
         // Save settings to disk
-        await SettingsHelper.SaveGlobalSettings(new()
-        {
-            Format = settingsDialogData.Format,
-            UpdateInterval = settingsDialogData.UpdateInterval,
-            ShowClockIcon = settingsDialogData.ShowClockIcon,
-        });
+        await SettingsHelper.SaveGlobalSettings(
+            new()
+            {
+                Format = settingsDialogData.Format,
+                UpdateInterval = settingsDialogData.UpdateInterval,
+                ShowClockIcon = settingsDialogData.ShowClockIcon,
+            },
+            outputWindowService);
     }
+
+    public Task WriteException(string message)
+        => outputWindowService.WriteException(message, new Exception());
 }

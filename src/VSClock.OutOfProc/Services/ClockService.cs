@@ -7,14 +7,16 @@ using Timer = System.Timers.Timer;
 
 namespace VSClock.OutOfProc.Services;
 
-internal class ClockService(VisualStudioExtensibility extensibility) : DisposableObject
+internal class ClockService(
+    VisualStudioExtensibility extensibility,
+    OutputWindowService outputWindowService) : DisposableObject
 {
     private IInProcService? _inProcService;
     private Timer? UpdateTimer;
 
     public async Task InitializeAsync()
     {
-        var globalSettings = await SettingsHelper.LoadGlobalSettings();
+        var globalSettings = await SettingsHelper.LoadGlobalSettings(outputWindowService);
 
         InitializeTimer(globalSettings.UpdateInterval);
 
@@ -44,9 +46,9 @@ internal class ClockService(VisualStudioExtensibility extensibility) : Disposabl
 
             await _inProcService.Inject(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // TODO: Add logging
+            await outputWindowService.WriteException("Failed to inject clock.", e);
         }
     }
 
@@ -56,13 +58,13 @@ internal class ClockService(VisualStudioExtensibility extensibility) : Disposabl
         {
             Assumes.NotNull(_inProcService);
 
-            var globalSettings = await SettingsHelper.GetGlobalSettings();
+            var globalSettings = await SettingsHelper.GetGlobalSettings(outputWindowService);
 
             await _inProcService.UpdateClock(globalSettings.Format, globalSettings.ShowClockIcon);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // TODO: Add logging
+            await outputWindowService.WriteException("Failed to update clock.", e);
         }
     }
 
