@@ -44,7 +44,12 @@ internal class ClockService(
         {
             Assumes.NotNull(_inProcService);
 
-            await _inProcService.Inject(cancellationToken);
+            var result = await _inProcService.Inject(cancellationToken);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                await outputWindowService.WriteException("Failed to inject clock.", new Exception(result));
+            }
         }
         catch (Exception e)
         {
@@ -60,7 +65,12 @@ internal class ClockService(
 
             var globalSettings = await SettingsHelper.GetGlobalSettings(outputWindowService);
 
-            await _inProcService.UpdateClock(globalSettings.Format, globalSettings.ShowClockIcon);
+            var result = await _inProcService.UpdateClock(globalSettings.Format, globalSettings.ShowClockIcon);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                await outputWindowService.WriteException("Failed to update clock.", new Exception(result));
+            }
         }
         catch (Exception e)
         {

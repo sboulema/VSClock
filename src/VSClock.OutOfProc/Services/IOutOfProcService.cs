@@ -8,8 +8,6 @@ public interface IOutOfProcService
 
     Task OpenSettingsDialog(CancellationToken cancellationToken);
 
-    Task WriteException(string message);
-
     public static class Configuration
     {
         public const string ServiceName = "VSClock.OutOfProcService";

@@ -4,9 +4,9 @@ namespace VSClock.Services;
 
 public interface IInProcService
 {
-    Task Inject(CancellationToken cancellationToken);
+    Task<string> Inject(CancellationToken cancellationToken);
 
-    Task UpdateClock(string format, bool showClockIcon);
+    Task<string> UpdateClock(string format, bool showClockIcon);
 
     public static class Configuration
     {

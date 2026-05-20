@@ -57,7 +57,4 @@ internal class OutOfProcService(
             },
             outputWindowService);
     }
-
-    public Task WriteException(string message)
-        => outputWindowService.WriteException(message, new Exception());
 }

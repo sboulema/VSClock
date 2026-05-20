@@ -29,11 +29,8 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns>Awaitable Task</returns>
-    public async Task Inject(CancellationToken cancellationToken)
+    public async Task<string> Inject(CancellationToken cancellationToken)
     {
-        var outOfProcService = await extensibility.ServiceBroker
-            .GetProxyAsync<IOutOfProcService>(IOutOfProcService.Configuration.ServiceDescriptor, cancellationToken: default);
-
         try
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -50,14 +47,10 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
         }
         catch (Exception e)
         {
-            Assumes.NotNull(outOfProcService);
+            return $"Failed to inject clock control. '{e.Message}'";
+        }
 
-            await outOfProcService.WriteException($"Failed to inject clock control. '{e.Message}'");
-        }
-        finally
-        {
-            (outOfProcService as IDisposable)?.Dispose();
-        }
+        return string.Empty;
     }
 
     /// <summary>
@@ -65,12 +58,8 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
     /// </summary>
     /// <param name="format">DateTime format</param>
     /// <returns>Awaitable Task</returns>
-    public async Task UpdateClock(string format, bool showClockIcon)
+    public async Task<string> UpdateClock(string format, bool showClockIcon)
     {
-        var outOfProcService = await extensibility.ServiceBroker
-            .GetProxyAsync<IOutOfProcService>(IOutOfProcService.Configuration.ServiceDescriptor, cancellationToken: default);
-
-
         try
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -98,14 +87,10 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
         }
         catch (Exception e)
         {
-            Assumes.NotNull(outOfProcService);
+            return $"Failed to update clock control. '{e.Message}'";
+        }
 
-            await outOfProcService.WriteException($"Failed to update clock control. '{e.Message}'");
-        }
-        finally
-        {
-            (outOfProcService as IDisposable)?.Dispose();
-        }
+        return string.Empty;
     }
 
     private void RemoveClockIcon()
