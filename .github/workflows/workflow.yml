@@ -90,14 +90,13 @@ jobs:
         uses: actions/download-artifact@v8
 
       - name: Publish to Marketplace
-        run: >
-          & 'C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe'
-          publish
-          -payload ${{ github.workspace }}/${{ env.vsixPath }}
-          -publishManifest publish-manifest.json
-          -personalAccessToken ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+        uses: madskristensen/publish-marketplace@v2
+        with:
+          extension-file: ${{ github.workspace }}/${{ env.vsixPath }}
+          publish-manifest-file: publish-manifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }} # Trusted publishing blocked on https://github.com/microsoft/vsmarketplace/issues/2310
 
       - name: Publish to Open VSIX Gallery
-        uses: timheuer/openvsixpublish@v1
+        uses: madskristensen/publish-vsixgallery@v1
         with:
           vsix-file: ${{ env.vsixPath }}
