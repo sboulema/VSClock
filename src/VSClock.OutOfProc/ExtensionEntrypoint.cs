@@ -18,7 +18,10 @@ internal class ExtensionEntrypoint : Extension
                 version: ExtensionAssemblyVersion,
                 publisherName: "Samir Boulema",
                 displayName: "VSClock",
-                description: "Show a clock in the Visual Studio statusbar"),
+                description: "Show a clock in the Visual Studio statusbar")
+        {
+            DotnetTargetVersions = [DotnetTarget.Net8, DotnetTarget.Custom("net10.0")],
+        }
     };
 
     /// <inheritdoc />
