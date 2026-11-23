@@ -1,6 +1,7 @@
 ﻿using Microsoft;
 using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 using System.Windows;
 using System.Windows.Controls;
@@ -142,9 +143,12 @@ internal class InProcService(VisualStudioExtensibility extensibility) : IInProcS
         _clockTextBlock = new()
         {
             VerticalAlignment = VerticalAlignment.Center,
-            Foreground = Application.Current.TryFindResource(VsBrushes.StatusBarTextKey) as SolidColorBrush,
             Margin = new Thickness(0, 0, 9, 0),
         };
+
+        _clockTextBlock.SetResourceReference(
+            TextBlock.ForegroundProperty,
+            EnvironmentColors.StatusBarDefaultTextBrushKey);
     }
 
     /// <summary>
